@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard | Burgess Hill Tamil Kuzhu</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Playfair+Display:wght@600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .admin-section {
+            padding-top: 100px;
+            min-height: 100vh;
+            background-color: #f5f5f5;
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .sheet-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            height: 80vh;
+            position: relative;
+        }
+
+        .sheet-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .logout-btn {
+            background-color: #d32f2f;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+
+        .logout-btn:hover {
+            background-color: #b71c1c;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="container nav-container">
+            <a href="index.html" class="logo">Burgess Hill <span class="highlight">Tamil Kuzhu</span></a>
+            <div style="display: flex; align-items: center; gap: 20px;">
+                <span style="font-weight: 600;">Welcome, Admin</span>
+                <button id="logout-btn" class="logout-btn">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Admin Section -->
+    <section class="admin-section">
+        <div class="container">
+            <div class="admin-header">
+                <h2>Event Registrations</h2>
+                <p>View and manage all registrations below.</p>
+            </div>
+
+            <div class="sheet-container">
+                <!-- Placeholder Google Sheet URL - Replace with actual URL -->
+                <iframe
+                    src="https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit?gid=0#gid=0"></iframe>
+            </div>
+        </div>
+    </section>
+
+    <!-- Script -->
+    <script src="script.js"></script>
+    <script>
+        // Immediate check for auth to prevent flash of content
+        if (!sessionStorage.getItem('isAuthenticated')) {
+            window.location.href = 'login.html';
+        }
+    </script>
+</body>
+
+</html>

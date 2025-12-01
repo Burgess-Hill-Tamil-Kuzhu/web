@@ -126,4 +126,32 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    // --- Login Logic ---
+    const loginForm = document.getElementById('login-form');
+    const loginError = document.getElementById('login-error');
+
+    if (loginForm) {
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const username = loginForm.username.value;
+            const password = loginForm.password.value;
+
+            if (username === 'admin' && password === 'admin') {
+                sessionStorage.setItem('isAuthenticated', 'true');
+                window.location.href = 'admin.html';
+            } else {
+                loginError.style.display = 'block';
+            }
+        });
+    }
+
+    // --- Logout Logic ---
+    const logoutBtn = document.getElementById('logout-btn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', () => {
+            sessionStorage.removeItem('isAuthenticated');
+            window.location.href = 'index.html';
+        });
+    }
 });
