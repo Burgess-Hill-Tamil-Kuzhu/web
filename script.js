@@ -132,12 +132,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const loginError = document.getElementById('login-error');
 
     if (loginForm) {
-        loginForm.addEventListener('submit', (e) => {
+        loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const username = loginForm.username.value;
             const password = loginForm.password.value;
 
-            if (username === 'admin' && password === 'admin') {
+            // Hash the password
+            const msgBuffer = new TextEncoder().encode(password);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
+            const TARGET_HASH = "6c8f38293ab6bc334c703ba27fd3dce4c6632eec49d325ed9e38572372956cc6";
+
+            if (username === 'admin' && hashHex === TARGET_HASH) {
                 sessionStorage.setItem('isAuthenticated', 'true');
                 window.location.href = 'admin.html';
             } else {
