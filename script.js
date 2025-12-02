@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('registration-form');
     const submitBtn = document.getElementById('submit-btn');
 
-    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz1gWWMkiSAyQ5RXw-ul-d4XvTWlgI14stqUx7rvCjWbMXgqBFP79OcoY3xaHNRPQNj/exec";
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxvPpgWFpxziZKS-lbGlLF5Ga8uUDsY5oKPJ1LSzsfz_brKBcwblfo1fBQm-AC2JeB3/exec";
 
     if (registerBtn && formContainer && cancelBtn && form) {
         
@@ -354,15 +354,15 @@ document.addEventListener('DOMContentLoaded', () => {
             renderTable(registrations);
 
             try {
-                // Use URLSearchParams for reliable 'e.parameter' parsing in GAS
-                const params = new URLSearchParams();
-                params.append('action', 'delete');
-                params.append('id', id);
+                // Use FormData to match the working 'create' implementation
+                const formData = new FormData();
+                formData.append('action', 'delete');
+                formData.append('id', id);
 
                 await fetch(GOOGLE_SCRIPT_URL, {
                     method: "POST",
-                    body: params,
-                    mode: "no-cors" // Important: GAS requires no-cors for simple POSTs from browser
+                    body: formData,
+                    mode: "no-cors"
                 });
                 
                 alert("Registration deleted.");
@@ -410,15 +410,15 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             try {
-                // Use URLSearchParams
-                const params = new URLSearchParams();
-                params.append('action', 'update');
-                params.append('id', id);
-                params.append('data', JSON.stringify(updatedData));
+                // Use FormData
+                const formData = new FormData();
+                formData.append('action', 'update');
+                formData.append('id', id);
+                formData.append('data', JSON.stringify(updatedData));
 
                 await fetch(GOOGLE_SCRIPT_URL, {
                     method: "POST",
-                    body: params,
+                    body: formData,
                     mode: "no-cors"
                 });
                 
