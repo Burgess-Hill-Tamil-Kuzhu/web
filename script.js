@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('registration-form');
     const submitBtn = document.getElementById('submit-btn');
 
-    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby0gkeUtJIPrpJ5Pz7uEmfSYOKXFSw1oPdZjzcJMFqj4gge5_k7WRw489wFyM-Wklgb/exec";
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyoQrxv51bi9DLkJfQ7H48hVWBbXkfrCP484GGztBd6wxJdnZT6bWH3wUXF5Laq6prk/exec";
 
     if (registerBtn && formContainer && cancelBtn && form) {
         
