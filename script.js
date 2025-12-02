@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('registration-form');
     const submitBtn = document.getElementById('submit-btn');
 
-    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwuTXlffNsfUDggROHm1QoUrahgI4sAfUm9XCNWMFe2T4lihWqslnnyY4dChj8mMq7N/exec";
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyhBZOV8b2vYvNaZ9lkPfWRFd9UKEVw49KmHlQnYmWiqyJc7vY83O6mceX396isn7K0/exec";
 
     if (registerBtn && formContainer && cancelBtn && form) {
         
@@ -77,8 +77,9 @@ document.addEventListener('DOMContentLoaded', () => {
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            // Get values
+            // Create FormData object for Google Apps Script
             const formData = new FormData(form);
+            formData.append('action', 'create'); // Explicitly set action
             const data = Object.fromEntries(formData.entries());
 
             // Validation
