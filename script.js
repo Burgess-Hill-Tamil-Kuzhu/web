@@ -137,7 +137,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const username = loginForm.username.value;
             const password = loginForm.password.value;
 
-            if (username === 'admin' && password === 'burgesshill') {
+            if (username === 'admin' && password === 'admin') {
                 sessionStorage.setItem('isAuthenticated', 'true');
                 window.location.href = 'admin.html';
             } else {
