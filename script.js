@@ -134,8 +134,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (loginForm) {
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const username = loginForm.username.value;
-            const password = loginForm.password.value;
+            const username = loginForm.username.value.trim();
+            const password = loginForm.password.value.trim();
 
             // Hash the password
             const msgBuffer = new TextEncoder().encode(password);
@@ -145,10 +145,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const TARGET_HASH = "6c8f38293ab6bc334c703ba27fd3dce4c6632eec49d325ed9e38572372956cc6";
 
+            console.log("Debug Login:");
+            console.log("Username:", username);
+            console.log("Input Password:", password); // Remove in production
+            console.log("Computed Hash:", hashHex);
+            console.log("Target Hash:  ", TARGET_HASH);
+
             if (username === 'admin' && hashHex === TARGET_HASH) {
+                console.log("Login Success");
                 sessionStorage.setItem('isAuthenticated', 'true');
                 window.location.href = 'admin.html';
             } else {
+                console.log("Login Failed");
                 loginError.style.display = 'block';
             }
         });
