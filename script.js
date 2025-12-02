@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('registration-form');
     const submitBtn = document.getElementById('submit-btn');
 
-    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx1IIFF1g2QFBltVUlAF4WWXV_HXdsL9xJFucKSFBwQNEAc7VuHHo4qwnnxZ7eX9wxV/exec";
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwuTXlffNsfUDggROHm1QoUrahgI4sAfUm9XCNWMFe2T4lihWqslnnyY4dChj8mMq7N/exec";
 
     if (registerBtn && formContainer && cancelBtn && form) {
         
@@ -152,6 +152,187 @@ document.addEventListener('DOMContentLoaded', () => {
         logoutBtn.addEventListener('click', () => {
             sessionStorage.removeItem('isAuthenticated');
             window.location.href = 'index.html';
+        });
+    }
+    // --- Admin Dashboard Logic ---
+    if (window.location.pathname.includes('admin.html')) {
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwuTXlffNsfUDggROHm1QoUrahgI4sAfUm9XCNWMFe2T4lihWqslnnyY4dChj8mMq7N/exec";
+        
+        // State
+        let registrations = [];
+
+        const tableBody = document.getElementById('table-body');
+        const searchInput = document.getElementById('search-input');
+        const refreshBtn = document.getElementById('refresh-btn');
+        
+        // Modals
+        const viewModal = document.getElementById('view-modal');
+        const editModal = document.getElementById('edit-modal');
+        const closeBtns = document.querySelectorAll('.close-modal, .close-modal-btn');
+        const editForm = document.getElementById('edit-form');
+
+        // Initial Fetch
+        fetchRegistrations();
+
+        // Fetch Function
+        async function fetchRegistrations() {
+            tableBody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 20px;"><i class="fas fa-spinner fa-spin"></i> Loading data from Google Sheet...</td></tr>';
+            
+            try {
+                const response = await fetch(GOOGLE_SCRIPT_URL);
+                if (!response.ok) throw new Error('Network response was not ok');
+                
+                const data = await response.json();
+                
+                // Transform data if necessary (assuming array of objects from GAS)
+                // If GAS returns { data: [...] } adjust accordingly. 
+                // Assuming GAS returns plain array of objects as per my previous instructions.
+                registrations = Array.isArray(data) ? data : (data.data || []);
+                
+                renderTable(registrations);
+            } catch (error) {
+                console.error("Error fetching data:", error);
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="8" style="text-align: center; padding: 20px; color: #d32f2f;">
+                            <i class="fas fa-exclamation-circle"></i> Failed to load data.<br>
+                            <small>Error: ${error.message}. Ensure your Google Script has a <code>doGet</code> function deployed.</small>
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+        // Render Function
+        function renderTable(data) {
+            tableBody.innerHTML = '';
+            
+            if (!data || data.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 20px;">No records found</td></tr>';
+                return;
+            }
+
+            data.forEach(reg => {
+                const row = document.createElement('tr');
+                // Handle case-insensitive keys if GAS returns different casing
+                const status = reg.status || reg.Status || 'Pending';
+                const statusClass = `status-${status.toLowerCase()}`;
+                
+                // Helper to safely get value
+                const getVal = (key) => reg[key] || reg[key.toLowerCase()] || '';
+
+                row.innerHTML = `
+                    <td>${getVal('Name') || getVal('name')}</td>
+                    <td>${getVal('Mobile') || getVal('mobile')}</td>
+                    <td>${getVal('Adults') || getVal('adults')}</td>
+                    <td>${getVal('Kids') || getVal('kids')}</td>
+                    <td>${getVal('Veg') || getVal('veg')}</td>
+                    <td>${getVal('NonVeg') || getVal('nonVeg')}</td>
+                    <td><span class="status-badge ${statusClass}">${status}</span></td>
+                    <td>
+                        <button class="action-btn btn-view" onclick="openViewModal('${getVal('id') || getVal('ID')}')"><i class="fas fa-eye"></i></button>
+                        <button class="action-btn btn-edit" onclick="openEditModal('${getVal('id') || getVal('ID')}')"><i class="fas fa-pencil-alt"></i></button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        // Search Logic
+        searchInput.addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            const filtered = registrations.filter(reg => {
+                const name = (reg.name || reg.Name || '').toLowerCase();
+                const mobile = (reg.mobile || reg.Mobile || '').toString();
+                return name.includes(term) || mobile.includes(term);
+            });
+            renderTable(filtered);
+        });
+
+        // Refresh Logic
+        refreshBtn.addEventListener('click', () => {
+            const icon = refreshBtn.querySelector('i');
+            icon.classList.add('fa-spin');
+            fetchRegistrations().finally(() => {
+                setTimeout(() => icon.classList.remove('fa-spin'), 500);
+            });
+        });
+
+        // Modal Logic
+        window.openViewModal = (id) => {
+            // Loose comparison for ID as it might be string/number
+            const reg = registrations.find(r => (r.id || r.ID) == id);
+            if (!reg) return;
+
+            const getVal = (key) => reg[key] || reg[key.toLowerCase()] || '';
+
+            const content = `
+                <div class="detail-row"><span class="detail-label">Name:</span> <span class="detail-value">${getVal('Name')}</span></div>
+                <div class="detail-row"><span class="detail-label">Mobile:</span> <span class="detail-value">${getVal('Mobile')}</span></div>
+                <div class="detail-row"><span class="detail-label">Adults:</span> <span class="detail-value">${getVal('Adults')}</span></div>
+                <div class="detail-row"><span class="detail-label">Kids:</span> <span class="detail-value">${getVal('Kids')}</span></div>
+                <div class="detail-row"><span class="detail-label">Veg Meals:</span> <span class="detail-value">${getVal('Veg')}</span></div>
+                <div class="detail-row"><span class="detail-label">Non-Veg Meals:</span> <span class="detail-value">${getVal('NonVeg')}</span></div>
+                <div class="detail-row"><span class="detail-label">Status:</span> <span class="detail-value">${getVal('Status')}</span></div>
+                <div class="detail-row"><span class="detail-label">Registered At:</span> <span class="detail-value">${getVal('Timestamp') || 'N/A'}</span></div>
+            `;
+            document.getElementById('view-modal-body').innerHTML = content;
+            viewModal.classList.add('active');
+        };
+
+        window.openEditModal = (id) => {
+            const reg = registrations.find(r => (r.id || r.ID) == id);
+            if (!reg) return;
+
+            const getVal = (key) => reg[key] || reg[key.toLowerCase()] || '';
+
+            document.getElementById('edit-id').value = getVal('id');
+            document.getElementById('edit-name').value = getVal('Name');
+            document.getElementById('edit-mobile').value = getVal('Mobile');
+            document.getElementById('edit-adults').value = getVal('Adults');
+            document.getElementById('edit-kids').value = getVal('Kids');
+            document.getElementById('edit-veg').value = getVal('Veg');
+            document.getElementById('edit-nonVeg').value = getVal('NonVeg');
+            document.getElementById('edit-status').value = getVal('Status');
+
+            editModal.classList.add('active');
+        };
+
+        // Close Modals
+        closeBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                viewModal.classList.remove('active');
+                editModal.classList.remove('active');
+            });
+        });
+
+        window.onclick = (event) => {
+            if (event.target == viewModal) viewModal.classList.remove('active');
+            if (event.target == editModal) editModal.classList.remove('active');
+        };
+
+        // Handle Edit Submit
+        editForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const id = parseInt(document.getElementById('edit-id').value);
+            const updatedData = {
+                name: document.getElementById('edit-name').value,
+                mobile: document.getElementById('edit-mobile').value,
+                adults: parseInt(document.getElementById('edit-adults').value),
+                kids: parseInt(document.getElementById('edit-kids').value),
+                veg: parseInt(document.getElementById('edit-veg').value),
+                nonVeg: parseInt(document.getElementById('edit-nonVeg').value),
+                status: document.getElementById('edit-status').value
+            };
+
+            // Update Mock Data
+            const index = registrations.findIndex(r => r.id === id);
+            if (index !== -1) {
+                registrations[index] = { ...registrations[index], ...updatedData };
+                renderTable(registrations);
+                editModal.classList.remove('active');
+                alert('Registration updated successfully!');
+            }
         });
     }
 });

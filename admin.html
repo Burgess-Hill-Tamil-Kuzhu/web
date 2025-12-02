@@ -85,10 +85,109 @@
                 <p>View and manage all registrations below.</p>
             </div>
 
-            <div class="sheet-container">
-                <!-- Placeholder Google Sheet URL - Replace with actual URL -->
-                <iframe
-                    src="https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit?gid=0#gid=0"></iframe>
+            <div class="dashboard-container">
+                <!-- Toolbar -->
+                <div class="dashboard-toolbar">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="search-input" placeholder="Search by name or mobile...">
+                    </div>
+                    <button id="refresh-btn" class="btn-icon" title="Refresh Data">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+
+                <!-- Data Table -->
+                <div class="table-responsive">
+                    <table class="admin-table" id="registrations-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Mobile</th>
+                                <th>Adults</th>
+                                <th>Kids</th>
+                                <th>Veg</th>
+                                <th>Non-Veg</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-body">
+                            <!-- Rows will be populated by JS -->
+                            <tr>
+                                <td colspan="8" style="text-align: center; padding: 20px;">Loading data...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- View Modal -->
+            <div id="view-modal" class="modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>Registration Details</h3>
+                        <span class="close-modal">&times;</span>
+                    </div>
+                    <div class="modal-body" id="view-modal-body">
+                        <!-- Details injected here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Edit Modal -->
+            <div id="edit-modal" class="modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>Edit Registration</h3>
+                        <span class="close-modal">&times;</span>
+                    </div>
+                    <div class="modal-body">
+                        <form id="edit-form">
+                            <input type="hidden" id="edit-id" name="id">
+                            <div class="form-group">
+                                <label>Name</label>
+                                <input type="text" id="edit-name" name="name" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Mobile</label>
+                                <input type="tel" id="edit-mobile" name="mobile" required>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Adults</label>
+                                    <input type="number" id="edit-adults" name="adults" min="1" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Kids</label>
+                                    <input type="number" id="edit-kids" name="kids" min="0">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Veg</label>
+                                    <input type="number" id="edit-veg" name="veg" min="0">
+                                </div>
+                                <div class="form-group">
+                                    <label>Non-Veg</label>
+                                    <input type="number" id="edit-nonVeg" name="nonVeg" min="0">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Status</label>
+                                <select id="edit-status" name="status">
+                                    <option value="Pending">Pending</option>
+                                    <option value="Confirmed">Confirmed</option>
+                                    <option value="Cancelled">Cancelled</option>
+                                </select>
+                            </div>
+                            <div class="modal-actions">
+                                <button type="button" class="btn-secondary close-modal-btn">Cancel</button>
+                                <button type="submit" class="btn-primary">Save Changes</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
