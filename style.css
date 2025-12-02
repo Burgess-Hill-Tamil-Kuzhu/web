@@ -1108,6 +1108,10 @@ footer {
     color: var(--secondary-color);
 }
 
+.btn-delete {
+    color: #d32f2f;
+}
+
 .action-btn:hover {
     transform: scale(1.2);
 }
@@ -1146,6 +1150,7 @@ footer {
         transform: translateY(-20px);
         opacity: 0;
     }
+
     to {
         transform: translateY(0);
         opacity: 1;

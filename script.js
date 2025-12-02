@@ -230,24 +230,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
             data.forEach(reg => {
                 const row = document.createElement('tr');
-                // Handle case-insensitive keys if GAS returns different casing
-                const status = reg.status || reg.Status || 'Pending';
-                const statusClass = `status-${status.toLowerCase()}`;
                 
                 // Helper to safely get value
                 const getVal = (key) => reg[key] || reg[key.toLowerCase()] || '';
+                
+                // Calculate Total
+                const adults = parseInt(getVal('Adults') || getVal('adults') || 0);
+                const kids = parseInt(getVal('Kids') || getVal('kids') || 0);
+                const total = adults + kids;
 
                 row.innerHTML = `
                     <td>${getVal('Name') || getVal('name')}</td>
                     <td>${getVal('Mobile') || getVal('mobile')}</td>
-                    <td>${getVal('Adults') || getVal('adults')}</td>
-                    <td>${getVal('Kids') || getVal('kids')}</td>
+                    <td>${adults}</td>
+                    <td>${kids}</td>
+                    <td><strong>${total}</strong></td>
                     <td>${getVal('Veg') || getVal('veg')}</td>
                     <td>${getVal('NonVeg') || getVal('nonVeg')}</td>
-                    <td><span class="status-badge ${statusClass}">${status}</span></td>
                     <td>
                         <button class="action-btn btn-view" onclick="openViewModal('${getVal('id') || getVal('ID')}')"><i class="fas fa-eye"></i></button>
                         <button class="action-btn btn-edit" onclick="openEditModal('${getVal('id') || getVal('ID')}')"><i class="fas fa-pencil-alt"></i></button>
+                        <button class="action-btn btn-delete" onclick="deleteRegistration('${getVal('id') || getVal('ID')}')"><i class="fas fa-trash"></i></button>
                     </td>
                 `;
                 tableBody.appendChild(row);
@@ -281,15 +284,17 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!reg) return;
 
             const getVal = (key) => reg[key] || reg[key.toLowerCase()] || '';
+            const adults = parseInt(getVal('Adults') || getVal('adults') || 0);
+            const kids = parseInt(getVal('Kids') || getVal('kids') || 0);
 
             const content = `
                 <div class="detail-row"><span class="detail-label">Name:</span> <span class="detail-value">${getVal('Name')}</span></div>
                 <div class="detail-row"><span class="detail-label">Mobile:</span> <span class="detail-value">${getVal('Mobile')}</span></div>
-                <div class="detail-row"><span class="detail-label">Adults:</span> <span class="detail-value">${getVal('Adults')}</span></div>
-                <div class="detail-row"><span class="detail-label">Kids:</span> <span class="detail-value">${getVal('Kids')}</span></div>
+                <div class="detail-row"><span class="detail-label">Adults:</span> <span class="detail-value">${adults}</span></div>
+                <div class="detail-row"><span class="detail-label">Kids:</span> <span class="detail-value">${kids}</span></div>
+                <div class="detail-row"><span class="detail-label">Total:</span> <span class="detail-value">${adults + kids}</span></div>
                 <div class="detail-row"><span class="detail-label">Veg Meals:</span> <span class="detail-value">${getVal('Veg')}</span></div>
                 <div class="detail-row"><span class="detail-label">Non-Veg Meals:</span> <span class="detail-value">${getVal('NonVeg')}</span></div>
-                <div class="detail-row"><span class="detail-label">Status:</span> <span class="detail-value">${getVal('Status')}</span></div>
                 <div class="detail-row"><span class="detail-label">Registered At:</span> <span class="detail-value">${getVal('Timestamp') || 'N/A'}</span></div>
             `;
             document.getElementById('view-modal-body').innerHTML = content;
@@ -309,9 +314,37 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('edit-kids').value = getVal('Kids');
             document.getElementById('edit-veg').value = getVal('Veg');
             document.getElementById('edit-nonVeg').value = getVal('NonVeg');
-            document.getElementById('edit-status').value = getVal('Status');
 
             editModal.classList.add('active');
+        };
+
+        // Delete Logic
+        window.deleteRegistration = async (id) => {
+            if (!confirm("Are you sure you want to delete this registration?")) return;
+
+            // Optimistic UI update
+            registrations = registrations.filter(r => (r.id || r.ID) != id);
+            renderTable(registrations);
+
+            try {
+                // Send delete request to GAS
+                const formData = new FormData();
+                formData.append('action', 'delete');
+                formData.append('id', id);
+
+                await fetch(GOOGLE_SCRIPT_URL, {
+                    method: "POST",
+                    body: formData,
+                    mode: "no-cors"
+                });
+                
+                alert("Registration deleted.");
+            } catch (error) {
+                console.error("Error deleting:", error);
+                alert("Error deleting registration. Please check console.");
+                // Revert on error (optional, but good practice)
+                fetchRegistrations();
+            }
         };
 
         // Close Modals
@@ -328,26 +361,43 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         // Handle Edit Submit
-        editForm.addEventListener('submit', (e) => {
+        editForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const id = parseInt(document.getElementById('edit-id').value);
+            const id = document.getElementById('edit-id').value;
             const updatedData = {
                 name: document.getElementById('edit-name').value,
                 mobile: document.getElementById('edit-mobile').value,
                 adults: parseInt(document.getElementById('edit-adults').value),
                 kids: parseInt(document.getElementById('edit-kids').value),
                 veg: parseInt(document.getElementById('edit-veg').value),
-                nonVeg: parseInt(document.getElementById('edit-nonVeg').value),
-                status: document.getElementById('edit-status').value
+                nonVeg: parseInt(document.getElementById('edit-nonVeg').value)
             };
 
-            // Update Mock Data
-            const index = registrations.findIndex(r => r.id === id);
+            // Optimistic Update
+            const index = registrations.findIndex(r => (r.id || r.ID) == id);
             if (index !== -1) {
                 registrations[index] = { ...registrations[index], ...updatedData };
                 renderTable(registrations);
                 editModal.classList.remove('active');
+            }
+
+            try {
+                const formData = new FormData();
+                formData.append('action', 'update');
+                formData.append('id', id);
+                formData.append('data', JSON.stringify(updatedData));
+
+                await fetch(GOOGLE_SCRIPT_URL, {
+                    method: "POST",
+                    body: formData,
+                    mode: "no-cors"
+                });
+                
                 alert('Registration updated successfully!');
+            } catch (error) {
+                console.error("Error updating:", error);
+                alert("Error updating registration.");
+                fetchRegistrations();
             }
         });
     }
