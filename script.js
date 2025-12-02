@@ -222,11 +222,18 @@ document.addEventListener('DOMContentLoaded', () => {
         // Render Function
         function renderTable(data) {
             tableBody.innerHTML = '';
+            const tableFooter = document.getElementById('table-footer');
             
             if (!data || data.length === 0) {
-                tableBody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 20px;">No records found</td></tr>';
+                tableBody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 20px;">No records found</td></tr>';
+                tableFooter.innerHTML = '';
                 return;
             }
+
+            let totalAdults = 0;
+            let totalKids = 0;
+            let totalVeg = 0;
+            let totalNonVeg = 0;
 
             data.forEach(reg => {
                 const row = document.createElement('tr');
@@ -234,19 +241,25 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Helper to safely get value
                 const getVal = (key) => reg[key] || reg[key.toLowerCase()] || '';
                 
-                // Calculate Total
+                // Parse values
                 const adults = parseInt(getVal('Adults') || getVal('adults') || 0);
                 const kids = parseInt(getVal('Kids') || getVal('kids') || 0);
-                const total = adults + kids;
+                const veg = parseInt(getVal('Veg') || getVal('veg') || 0);
+                const nonVeg = parseInt(getVal('NonVeg') || getVal('nonVeg') || 0);
+
+                // Add to totals
+                totalAdults += adults;
+                totalKids += kids;
+                totalVeg += veg;
+                totalNonVeg += nonVeg;
 
                 row.innerHTML = `
                     <td>${getVal('Name') || getVal('name')}</td>
                     <td>${getVal('Mobile') || getVal('mobile')}</td>
                     <td>${adults}</td>
                     <td>${kids}</td>
-                    <td><strong>${total}</strong></td>
-                    <td>${getVal('Veg') || getVal('veg')}</td>
-                    <td>${getVal('NonVeg') || getVal('nonVeg')}</td>
+                    <td>${veg}</td>
+                    <td>${nonVeg}</td>
                     <td>
                         <button class="action-btn btn-view" onclick="openViewModal('${getVal('id') || getVal('ID')}')"><i class="fas fa-eye"></i></button>
                         <button class="action-btn btn-edit" onclick="openEditModal('${getVal('id') || getVal('ID')}')"><i class="fas fa-pencil-alt"></i></button>
@@ -255,6 +268,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 `;
                 tableBody.appendChild(row);
             });
+
+            // Render Footer
+            tableFooter.innerHTML = `
+                <tr>
+                    <td colspan="2" style="text-align: right; padding-right: 20px;"><strong>Total:</strong></td>
+                    <td>${totalAdults}</td>
+                    <td>${totalKids}</td>
+                    <td>${totalVeg}</td>
+                    <td>${totalNonVeg}</td>
+                    <td></td>
+                </tr>
+            `;
         }
 
         // Search Logic

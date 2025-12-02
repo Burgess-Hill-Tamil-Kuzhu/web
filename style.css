@@ -1067,6 +1067,17 @@ footer {
     color: var(--text-dark);
 }
 
+.admin-table tfoot tr {
+    background-color: #e0e0e0;
+    font-weight: bold;
+    border-top: 2px solid #ccc;
+}
+
+.admin-table tfoot td {
+    color: var(--secondary-color);
+    font-size: 1.05rem;
+}
+
 /* Status Badges */
 .status-badge {
     padding: 5px 12px;
