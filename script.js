@@ -348,27 +348,29 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!confirm("Are you sure you want to delete this registration?")) return;
 
             // Optimistic UI update
+            const originalData = [...registrations]; // Backup
             registrations = registrations.filter(r => (r.id || r.ID) != id);
             renderTable(registrations);
 
             try {
-                // Send delete request to GAS
-                const formData = new FormData();
-                formData.append('action', 'delete');
-                formData.append('id', id);
+                // Use URLSearchParams for reliable 'e.parameter' parsing in GAS
+                const params = new URLSearchParams();
+                params.append('action', 'delete');
+                params.append('id', id);
 
                 await fetch(GOOGLE_SCRIPT_URL, {
                     method: "POST",
-                    body: formData,
-                    mode: "no-cors"
+                    body: params,
+                    mode: "no-cors" // Important: GAS requires no-cors for simple POSTs from browser
                 });
                 
                 alert("Registration deleted.");
             } catch (error) {
                 console.error("Error deleting:", error);
-                alert("Error deleting registration. Please check console.");
-                // Revert on error (optional, but good practice)
-                fetchRegistrations();
+                alert("Error deleting registration. Reverting changes.");
+                // Revert on error
+                registrations = originalData;
+                renderTable(registrations);
             }
         };
 
@@ -407,14 +409,15 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             try {
-                const formData = new FormData();
-                formData.append('action', 'update');
-                formData.append('id', id);
-                formData.append('data', JSON.stringify(updatedData));
+                // Use URLSearchParams
+                const params = new URLSearchParams();
+                params.append('action', 'update');
+                params.append('id', id);
+                params.append('data', JSON.stringify(updatedData));
 
                 await fetch(GOOGLE_SCRIPT_URL, {
                     method: "POST",
-                    body: formData,
+                    body: params,
                     mode: "no-cors"
                 });
                 
@@ -422,7 +425,7 @@ document.addEventListener('DOMContentLoaded', () => {
             } catch (error) {
                 console.error("Error updating:", error);
                 alert("Error updating registration.");
-                fetchRegistrations();
+                fetchRegistrations(); // Re-fetch to sync
             }
         });
     }
