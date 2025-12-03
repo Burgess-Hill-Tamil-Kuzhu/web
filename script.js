@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('registration-form');
     const submitBtn = document.getElementById('submit-btn');
 
-    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyGGQR3EHTN_Tkqpu3fmZlsMGgoMGoEasgZNhMj9BAZODe_V2Sewdkm29uSfKMejD2i/exec";
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxYCzgSxjhvxYz8jvahlxr3f4CxZAvtcQi0Hzdpj365qkgqz_25HJMG_IjKLT4S5Kls/exec";
 
     if (registerBtn && formContainer && cancelBtn && form) {
         
@@ -173,7 +173,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     // --- Admin Dashboard Logic ---
     if (window.location.pathname.includes('admin.html')) {
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyGGQR3EHTN_Tkqpu3fmZlsMGgoMGoEasgZNhMj9BAZODe_V2Sewdkm29uSfKMejD2i/exec";
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxYCzgSxjhvxYz8jvahlxr3f4CxZAvtcQi0Hzdpj365qkgqz_25HJMG_IjKLT4S5Kls/exec";
         
         // State
         let registrations = [];
