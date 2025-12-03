@@ -173,7 +173,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     // --- Admin Dashboard Logic ---
     if (window.location.pathname.includes('admin.html')) {
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwuTXlffNsfUDggROHm1QoUrahgI4sAfUm9XCNWMFe2T4lihWqslnnyY4dChj8mMq7N/exec";
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyGGQR3EHTN_Tkqpu3fmZlsMGgoMGoEasgZNhMj9BAZODe_V2Sewdkm29uSfKMejD2i/exec";
         
         // State
         let registrations = [];
