@@ -1,10 +1,16 @@
 const SHEET_NAME = "Sheet1";
+const ADMIN_TOKEN = "6c8f38293ab6bc334c703ba27fd3dce4c6632eec49d325ed9e38572372956cc6"; // CHANGE THIS TO A STRONG SECRET
 
 function doGet(e) {
   const lock = LockService.getScriptLock();
   lock.tryLock(10000);
   
   try {
+    // Security Check: Verify Token
+    if (!e.parameter.token || e.parameter.token !== ADMIN_TOKEN) {
+      return ContentService.createTextOutput(JSON.stringify({ 'result': 'error', 'message': 'Unauthorized' })).setMimeType(ContentService.MimeType.JSON);
+    }
+
     const doc = SpreadsheetApp.getActiveSpreadsheet();
     const sheet = doc.getSheetByName(SHEET_NAME);
     
@@ -43,6 +49,7 @@ function doPost(e) {
     const action = e.parameter.action || 'create';
     
     if (action === 'create') {
+      // Public Action: No Token Required (or optional)
       const nextRow = sheet.getLastRow() + 1;
       const newRow = headers.map((header, i) => {
         const headerLower = headersLower[i];
@@ -63,6 +70,11 @@ function doPost(e) {
     }
     
     else if (action === 'delete') {
+      // Security Check
+      if (!e.parameter.token || e.parameter.token !== ADMIN_TOKEN) {
+        return ContentService.createTextOutput(JSON.stringify({ 'result': 'error', 'message': 'Unauthorized' })).setMimeType(ContentService.MimeType.JSON);
+      }
+
       const idToDelete = e.parameter.id;
       const data = sheet.getDataRange().getValues();
       const idColIndex = headersLower.indexOf('id');
@@ -81,6 +93,11 @@ function doPost(e) {
     }
     
     else if (action === 'update') {
+      // Security Check
+      if (!e.parameter.token || e.parameter.token !== ADMIN_TOKEN) {
+        return ContentService.createTextOutput(JSON.stringify({ 'result': 'error', 'message': 'Unauthorized' })).setMimeType(ContentService.MimeType.JSON);
+      }
+
       const idToUpdate = e.parameter.id;
       const updateData = JSON.parse(e.parameter.data);
       const data = sheet.getDataRange().getValues();

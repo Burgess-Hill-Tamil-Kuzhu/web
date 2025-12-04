@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('registration-form');
     const submitBtn = document.getElementById('submit-btn');
 
-    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxYCzgSxjhvxYz8jvahlxr3f4CxZAvtcQi0Hzdpj365qkgqz_25HJMG_IjKLT4S5Kls/exec";
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyyuCSC_lunatN9vXvxyivogoSZJsu7Eo5pFrKBavl5nVrjR2_ijxWUUlw49tpds_1x/exec";
 
     if (registerBtn && formContainer && cancelBtn && form) {
         
@@ -173,7 +173,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     // --- Admin Dashboard Logic ---
     if (window.location.pathname.includes('admin.html')) {
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxYCzgSxjhvxYz8jvahlxr3f4CxZAvtcQi0Hzdpj365qkgqz_25HJMG_IjKLT4S5Kls/exec";
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyyuCSC_lunatN9vXvxyivogoSZJsu7Eo5pFrKBavl5nVrjR2_ijxWUUlw49tpds_1x/exec";
+        const API_TOKEN = "6c8f38293ab6bc334c703ba27fd3dce4c6632eec49d325ed9e38572372956cc6"; // Must match the GAS script token
         
         // State
         let registrations = [];
@@ -196,7 +197,7 @@ document.addEventListener('DOMContentLoaded', () => {
             tableBody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 20px;"><i class="fas fa-spinner fa-spin"></i> Loading data from Google Sheet...</td></tr>';
             
             try {
-                const response = await fetch(GOOGLE_SCRIPT_URL);
+                const response = await fetch(`${GOOGLE_SCRIPT_URL}?token=${API_TOKEN}`);
                 if (!response.ok) throw new Error('Network response was not ok');
                 
                 const data = await response.json();
@@ -358,6 +359,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const formData = new FormData();
                 formData.append('action', 'delete');
                 formData.append('id', id);
+                formData.append('token', API_TOKEN);
 
                 await fetch(GOOGLE_SCRIPT_URL, {
                     method: "POST",
@@ -415,6 +417,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 formData.append('action', 'update');
                 formData.append('id', id);
                 formData.append('data', JSON.stringify(updatedData));
+                formData.append('token', API_TOKEN);
 
                 await fetch(GOOGLE_SCRIPT_URL, {
                     method: "POST",
